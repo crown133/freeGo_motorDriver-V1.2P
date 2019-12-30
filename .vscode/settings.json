@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "tle5012b.h": "c",
+        "flash.h": "c",
+        "stm32f4xx_hal_flash_ex.h": "c"
+    }
+}
