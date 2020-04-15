@@ -164,7 +164,7 @@ void drv8323_init(void)
     drv_write_OCPCReg(TRETRY_4MS, DEADTIME_200NS, OCP_RETRY, OCP_DEG_8US, VDS_LVL_1_88);
     delay_us(100);
     // drv_enable_gd();
-    zero_current(&controller.adc1_offset, &controller.adc2_offset);      // Measure current sensor zero-offset
+//    zero_current(&controller.adc1_offset, &controller.adc2_offset);    // Measure current sensor zero-offset  
     delay_us(10);
     drv_disable_gd();
 }

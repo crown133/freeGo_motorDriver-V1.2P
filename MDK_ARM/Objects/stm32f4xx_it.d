@@ -1,11 +1,11 @@
-./objects/stm32f4xx_it.o: ..\Hardware\Src\stm32f4xx_it.c \
+./objects/stm32f4xx_it.o: ..\Hardware\stm32f4xx_it.c \
   ..\Hardware\Inc\stm32f4xx_it.h \
   ..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h \
   ..\Hardware\Inc\stm32f4xx_hal_conf.h \
   ..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_rcc.h \
   ..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_def.h \
-  D:\MDK5\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h \
-  D:\MDK5\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f405xx.h \
+  ..\Hardware\Drivers\CMSIS\Include\stm32f4xx.h \
+  ..\Hardware\Drivers\CMSIS\Include\stm32f405xx.h \
   ..\Hardware\Drivers\CMSIS\Core\core_cm4.h \
   D:\MDK5\ARM\ARMCLANG\Bin\..\include\stdint.h \
   ..\Hardware\Drivers\CMSIS\Core\cmsis_version.h \
@@ -14,7 +14,7 @@
   D:\MDK5\ARM\ARMCLANG\Bin\..\include\arm_compat.h \
   D:\MDK5\ARM\ARMCLANG\Bin\..\include\arm_acle.h \
   ..\Hardware\Drivers\CMSIS\Core\mpu_armv7.h \
-  D:\MDK5\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include\system_stm32f4xx.h \
+  ..\Hardware\Drivers\CMSIS\Include\system_stm32f4xx.h \
   ..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\Legacy\stm32_hal_legacy.h \
   D:\MDK5\ARM\ARMCLANG\Bin\..\include\stddef.h \
   ..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_rcc_ex.h \

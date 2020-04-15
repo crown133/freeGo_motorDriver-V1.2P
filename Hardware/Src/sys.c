@@ -60,10 +60,13 @@ void SystemClock_Config(void)
 
 void SysNVIC_SetPriority(void)
 {
-    /* TIM3 interrupt Init */
-    HAL_NVIC_SetPriority(TIM3_IRQn, 0, 2);
-    HAL_NVIC_EnableIRQ(TIM3_IRQn);
-    
+//    /* TIM3 interrupt Init */
+//    HAL_NVIC_SetPriority(TIM3_IRQn, 0, 2);
+//    HAL_NVIC_EnableIRQ(TIM3_IRQn);
+    	
+			/* TIM1 interrupt Init */
+			HAL_NVIC_SetPriority(TIM1_UP_TIM10_IRQn, 0, 0);
+			HAL_NVIC_EnableIRQ(TIM1_UP_TIM10_IRQn);
 //    /* DMA2_Stream0_IRQn interrupt configuration */
 //    HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 1, 2);  //adc
 //    HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);

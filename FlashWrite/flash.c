@@ -4,9 +4,9 @@
 #include "delay.h"
 
 //由工程生成的 .map 文件可以看出整个程序所占大小为16.41KB，
-//为保险起见，程序不被flash操作擦除，将数据从第6扇区开始存起
-//64+256 Bytes，故需要6扇区
-#define __sector 6
+//为保险起见，程序不被flash操作擦除，将数据从第7扇区开始存起
+//64+256 Bytes，故需要7扇区
+#define __sector 7
 
 ///read flash
 static int flashReadInt(uint32_t sector, uint32_t index)
@@ -47,24 +47,32 @@ void flash_write(void)
     HAL_FLASH_Unlock();
     __HAL_FLASH_DATA_CACHE_DISABLE(); //disable data cache when erase sector
 
-    //erase sector 6
+    //erase sector 7
     FLASH_EraseInitTypeDef EraseInit;
     EraseInit.TypeErase = FLASH_TYPEERASE_SECTORS;
     EraseInit.Banks = FLASH_BANK_1;
-    EraseInit.Sector = FLASH_SECTOR_6;
-    EraseInit.NbSectors = 1; //sector 6
+    EraseInit.Sector = FLASH_SECTOR_7;
+    EraseInit.NbSectors = 1; //sector 7
     EraseInit.VoltageRange = FLASH_VOLTAGE_RANGE_3;
-    HAL_FLASHEx_Erase(&EraseInit, &sectorError);
+    int offs;
+    for (offs = 0; offs < 320; offs++) //it can not be erased for once time
+    {
+        if (flashReadUint(__sector, offs) != 0xFFFFFFFF)
+        {
+            HAL_FLASHEx_Erase(&EraseInit, &sectorError);
+        }
+    }
     delay_us(500);
-	  
-		int offs;
+
     for (offs = 0; offs < 256; offs++)
     {
-        HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, ADDR_FLASH_SECTOR_6 + 4*offs, __int_reg[offs]);
+        HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, ADDR_FLASH_SECTOR_7 + 4 * offs, __int_reg[offs]);
+        delay_us(10);
     }
     for (; offs < 320; offs++)
     {
-        HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, ADDR_FLASH_SECTOR_6 + 4*offs, __float_reg[offs - 256]);
+        HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, ADDR_FLASH_SECTOR_7 + 4 * offs, *(volatile uint32_t *)(__float_reg + offs - 256));
+        delay_us(10);
     }
 
     __HAL_FLASH_DATA_CACHE_ENABLE();

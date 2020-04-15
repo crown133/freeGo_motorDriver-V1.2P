@@ -1,8 +1,10 @@
 #include "foc.h"
+#include "motor_config.h"
+#include "user_config.h"
+
 
 ControllerStruct controller;
 ObserverStruct observer;
-
 
 /// Inverse DQ0 Transform ///
 void abc(float theta, float d, float q, float *a, float *b, float *c)
@@ -17,7 +19,6 @@ void abc(float theta, float d, float q, float *a, float *b, float *c)
     *c = (-0.86602540378f * sf - .5f * cf) * d - (0.86602540378f * cf - .5f * sf) * q;
 }
 
-
 /// Space Vector Modulation ///
 void svm(float v_bus, float u, float v, float w, float *dtc_u, float *dtc_v, float *dtc_w)
 {
@@ -29,12 +30,12 @@ void svm(float v_bus, float u, float v, float w, float *dtc_u, float *dtc_v, flo
     *dtc_w = fminf(fmaxf(((w - v_offset) / v_bus + .5f), DTC_MIN), DTC_MAX);
 }
 
-////七段式PWM
+////七段式SVPWM//
 //void SvpwmCommutation(float vd,float vq,float eleangle)//electrical degree
 //{
-//	float v_alpha,v_beta;
-//	float vr1,vr2,vr3;
-//	int flagA,flagB,flagC,flagN;
+//	float u_alpha, u_beta;
+//	float Uref1, Uref2, Uref3;
+//	u8 flagA,flagB,flagC,flagN;
 //	float T1,T2,t1,t2;
 //	float TS = 1800;
 
@@ -49,26 +50,26 @@ void svm(float v_bus, float u, float v, float w, float *dtc_u, float *dtc_v, flo
 // 	v_beta  =  vq*arm_cos_f32(eleangle);
 //
 
-//	vr1 = v_beta;
-//	vr2 = (-v_beta + gen3*v_alpha)/2.0f;
-//	vr3 = (-v_beta - gen3*v_alpha)/2.0f;
+//	Uref1 = u_beta;
+//	Uref2 = ( SQRT3 * u_alpha - u_beta) / 2.0f;
+//	Uref3 = (-SQRT3 * u_alpha - u_beta) / 2.0f;
 ///********************
 //以下为判断矢量电压所在扇区
 //*********************/
-//	if (vr1>0) flagA = 1; else flagA = 0;
-//	if (vr2>0) flagB = 1; else flagB = 0;
-//	if (vr3>0) flagC = 1; else flagC = 0;
+//	if(Uref1>0) {flagA = 1; else flagA = 0;}
+//	if(Uref2>0) {flagB = 1; else flagB = 0;}
+//	if(Uref3>0) {flagC = 1; else flagC = 0;}
 //	flagN = flagA + 2*flagB + 4*flagC;
 //
 
 //	switch(flagN)
 //	{
-//		case 3:	{T1 =  vr2*Kgen3; T2 =  vr1*Kgen3; break;}//u1,u2>0
-//		case 1:	{T1 = -vr2*Kgen3; T2 = -vr3*Kgen3; break;}//u1>0
-//		case 5:	{T1 =  vr1*Kgen3; T2 =  vr3*Kgen3; break;}//u1,u3>0
-//		case 4:	{T1 = -vr1*Kgen3; T2 = -vr2*Kgen3; break;}//u3>0
-//		case 6:	{T1 =  vr3*Kgen3; T2 =  vr2*Kgen3; break;}//u2,u3>0
-//		case 2:	{T1 = -vr3*Kgen3; T2 = -vr1*Kgen3; break;}//u2>0
+//		case 3:	{T1 =  vr2*Kgen3; T2 =  vr1*Kgen3; break;}//sector1 u1,u2>0
+//		case 1:	{T1 = -vr2*Kgen3; T2 = -vr3*Kgen3; break;}//sector2 u1>0
+//		case 5:	{T1 =  vr1*Kgen3; T2 =  vr3*Kgen3; break;}//sector3 u1,u3>0
+//		case 4:	{T1 = -vr1*Kgen3; T2 = -vr2*Kgen3; break;}//sector4 u3>0
+//		case 6:	{T1 =  vr3*Kgen3; T2 =  vr2*Kgen3; break;}//sector5 u2,u3>0
+//		case 2:	{T1 = -vr3*Kgen3; T2 = -vr1*Kgen3; break;}//sector6 u2>0
 //		default: {T1 = 0; T2 = 0; break;}
 //	}
 
@@ -97,7 +98,6 @@ void svm(float v_bus, float u, float v, float w, float *dtc_u, float *dtc_v, flo
 //
 //}
 
-
 /// DQ0 Transform ///
 void dq0(float theta, float a, float b, float c, float *d, float *q)
 {
@@ -122,9 +122,10 @@ void zero_current(int *offset_1, int *offset_2)
         TIM1->CCR3 = (PWM_ARR >> 1) * (1.0f); // Write duty cycles
         TIM1->CCR2 = (PWM_ARR >> 1) * (1.0f);
         TIM1->CCR1 = (PWM_ARR >> 1) * (1.0f);
+        ADC1->CR2 |= 0x40000000;  // Begin sample and conversion 三重同步模式下只开启adc1转换就能自动开启adc2 3
         delay_us(100);
-        adc2_offset += adc_buf[1];
-        adc1_offset += adc_buf[2];
+        adc2_offset += ADC2->DR;
+        adc1_offset += ADC3->DR;
     }
     *offset_1 = adc1_offset / n;
     *offset_2 = adc2_offset / n;
@@ -146,17 +147,17 @@ void linearize_dtc(float *dtc)
 
 void init_controller_params(ControllerStruct *controller)
 {
-//    controller->ki_d = KI_D;
-//    controller->ki_q = KI_Q;
-//    controller->kp_d = K_SCALE * I_BW;
-//    controller->kp_q = K_SCALE * I_BW;
-//    controller->alpha = 1.0f - 1.0f / (1.0f - DT * I_BW * 2.0f * PI);
-	  
-		controller->ki_d = KI_D;
-    controller->ki_q = KI_Q;
-    controller->kp_d = 0.0042;
-    controller->kp_q = 0.0042;
-//    controller->alpha = 1.0f - 1.0f / (1.0f - DT * I_BW * 2.0f * PI);
+    //    controller->ki_d = KI_D;
+    //    controller->ki_q = KI_Q;
+    //    controller->kp_d = K_SCALE * I_BW;
+    //    controller->kp_q = K_SCALE * I_BW;
+    //    controller->alpha = 1.0f - 1.0f / (1.0f - DT * I_BW * 2.0f * PI);
+
+    controller->ki_d = 0.0015f;
+    controller->ki_q = 0.0015f;
+    controller->kp_d = 0.026f;
+    controller->kp_q = 0.026f;
+    //    controller->alpha = 1.0f - 1.0f / (1.0f - DT * I_BW * 2.0f * PI);
 }
 
 void reset_foc(ControllerStruct *controller)
@@ -186,17 +187,17 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, float the
     /// Observer Prediction ///
 
     /// Commutation Loop ///
-    // if (PHASE_ORDER)
-    // {                                                                                        // Check current sensor ordering
-    //     controller->i_b = I_SCALE * (float)(controller->adc2_raw - controller->adc2_offset); // Calculate phase currents from ADC readings
-    //     controller->i_c = I_SCALE * (float)(controller->adc1_raw - controller->adc1_offset);
-    // }
-    // else
-    {
-        controller->i_a = I_SCALE * (float)(controller->adc1_raw - controller->adc1_offset);
-        controller->i_c = I_SCALE * (float)(controller->adc2_raw - controller->adc2_offset);
+    if (PHASE_ORDER)
+    {                                                                                        // Check current sensor ordering
+        controller->i_b = I_SCALE * (float)(controller->adc2_raw - controller->adc2_offset); // Calculate phase currents from ADC readings
+        controller->i_c = I_SCALE * (float)(controller->adc1_raw - controller->adc1_offset);
     }
-    controller->i_c = -controller->i_b - controller->i_c;
+    else
+    {
+        controller->i_c = I_SCALE * (float)(controller->adc2_raw - controller->adc2_offset);
+        controller->i_b = I_SCALE * (float)(controller->adc1_raw - controller->adc1_offset);
+    }
+    controller->i_a = -controller->i_b - controller->i_c;
 
     float s = FastSin(theta);
     float c = FastCos(theta);
@@ -240,7 +241,7 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, float the
 
     controller->v_ref = sqrt(controller->v_d * controller->v_d + controller->v_q * controller->v_q);
 
-    limit_norm(&controller->v_d, &controller->v_q, OVERMODULATION * controller->v_bus);     // Normalize voltage vector to lie within curcle of radius v_bus
+    limit_norm(&controller->v_d, &controller->v_q, OVERMODULATION * controller->v_bus);                                  // Normalize voltage vector to lie within curcle of radius v_bus
     abc(controller->theta_elec, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
 
     //controller->v_u = c*controller->v_d - s*controller->v_q;                // Faster Inverse DQ0 transform
@@ -251,20 +252,20 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, float the
     // observer->i_d_dot = 0.5f * (controller->v_d - 2.0f * (observer->i_d_est * R_PHASE - controller->dtheta_elec * L_Q * observer->i_q_est)) / L_D; //feed-forward voltage
     // observer->i_q_dot = 0.5f * (controller->v_q - 2.0f * (observer->i_q_est * R_PHASE + controller->dtheta_elec * (L_D * observer->i_d_est + WB))) / L_Q;
 
-    // if (PHASE_ORDER)
-    // {                                                        // Check which phase order to use,
-    //     TIM1->CCR3 = (PWM_ARR) * (1.0f - controller->dtc_u); // Write duty cycles
-    //     TIM1->CCR2 = (PWM_ARR) * (1.0f - controller->dtc_v);
-    //     TIM1->CCR1 = (PWM_ARR) * (1.0f - controller->dtc_w);
-    // }
-    // else
+    if (PHASE_ORDER)
+    {                                                        // Check which phase order to use,
+        TIM1->CCR3 = (PWM_ARR) * (1.0f - controller->dtc_u); // Write duty cycles
+        TIM1->CCR2 = (PWM_ARR) * (1.0f - controller->dtc_v);
+        TIM1->CCR1 = (PWM_ARR) * (1.0f - controller->dtc_w);
+    }
+    else
     {
         TIM1->CCR3 = (PWM_ARR) * (1.0f - controller->dtc_u);
         TIM1->CCR1 = (PWM_ARR) * (1.0f - controller->dtc_v);
         TIM1->CCR2 = (PWM_ARR) * (1.0f - controller->dtc_w);
     }
 
-    //    controller->theta_elec = theta; //For some reason putting this at the front breaks thins
+    controller->theta_elec = theta; //For some reason putting this at the front breaks thins
 
     if (controller->loop_count > 400)
     {
@@ -273,9 +274,10 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, float the
     }
 }
 
-// void torque_control(ControllerStruct *controller){
-//    float torque_ref = controller->kp*(controller->p_des - controller->theta_mech) + controller->t_ff + controller->kd*(controller->v_des - controller->dtheta_mech);
-//    //float torque_ref = -.1*(controller->p_des - controller->theta_mech);
-//    controller->i_q_ref = torque_ref/KT_OUT;
-//    controller->i_d_ref = 0.0f;
-//    }
+void torque_control(ControllerStruct *controller)
+{
+    float torque_ref = controller->kp * (controller->p_des - controller->theta_mech) + controller->t_ff + controller->kd * (controller->v_des - controller->dtheta_mech);
+    //float torque_ref = -.1*(controller->p_des - controller->theta_mech);
+    controller->i_q_ref = torque_ref / KT_OUT;
+    controller->i_d_ref = 0.0f;
+}

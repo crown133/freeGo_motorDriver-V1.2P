@@ -12,17 +12,18 @@ void MX_TIM1_Init(void)
     TIM_OC_InitTypeDef sConfigOC = {0};
     TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
 
-    htim1.Instance = TIM1;                                   //在中心�?�齐模式下产生的PWM波形的周期比实际计数周期要大1倍，所以�?�应的定时器时基应�?��?�为两�?
-    htim1.Init.Prescaler = 0;                                //定时�?1 APB2总线 时钟168MHz PWM周期 T=(prc+1)*(arr+1)/168M=25/2us约为12us
-    htim1.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED2; //与输出比较中�?标志有关
-    htim1.Init.Period = PWM_ARR;                            //168*24/2-1
-    htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;       //tdts = tck_int = 1/168M
-    htim1.Init.RepetitionCounter = 0;
+    htim1.Instance = TIM1;                                   //在中心对齐模式下产生的PWM波形的周期比实际计数周期要大1倍，所以定时器时基应�?��?�为两�?
+    htim1.Init.Prescaler = 0;                                //tim1 APB2总线 时钟168MHz PWM周期 T=(prc+1)*(arr+1)/168M=25/2us约为12us
+    htim1.Init.CounterMode = TIM_COUNTERMODE_CENTERALIGNED2;  //与输出比较中断标志有关
+    htim1.Init.Period = PWM_ARR;                            //168*25/2-1
+    htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;      //tdts = tck_int = 1/168M
+    htim1.Init.RepetitionCounter = 0;                       //update interrupt once pwm cycle
     htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
     if (HAL_TIM_PWM_Init(&htim1) != HAL_OK)
     {
         Error_Handler();
     }
+				
     sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
     sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
     if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
@@ -51,7 +52,7 @@ void MX_TIM1_Init(void)
     sBreakDeadTimeConfig.OffStateRunMode = TIM_OSSR_DISABLE;
     sBreakDeadTimeConfig.OffStateIDLEMode = TIM_OSSI_DISABLE;
     sBreakDeadTimeConfig.LockLevel = TIM_LOCKLEVEL_OFF;
-    sBreakDeadTimeConfig.DeadTime = DEADTIME; //DTG[7:0]  根据使用的MOS�?TPH2R506PL手册P3，关�?下降时间�?39ns //tdts = tck_int = 1/168M 约为6ns，故dtg = 7�?不�?�就够了
+    sBreakDeadTimeConfig.DeadTime = DEADTIME; //DTG[7:0]  根据使用的MOS�?TPH2R506PL手册P3，关�?下降时间�?39ns //tdts = tck_int = 1/168M 约为6ns，故dtg = 7�?不�?�就够了
     sBreakDeadTimeConfig.BreakState = TIM_BREAK_DISABLE;
     sBreakDeadTimeConfig.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
     sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
@@ -68,7 +69,6 @@ void MX_TIM1_Init(void)
 //    HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1);
 //    HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_2);
 //    HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_3);
-
     
     TIM1->CCR1 = PWM_ARR;
     TIM1->CCR2 = PWM_ARR;
@@ -110,6 +110,9 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *tim_pwmHandle)
     if (tim_pwmHandle->Instance == TIM1)
     {
         __HAL_RCC_TIM1_CLK_ENABLE();
+//			    /* TIM1 interrupt Init */
+//				HAL_NVIC_SetPriority(TIM1_UP_TIM10_IRQn, 0, 0);
+//				HAL_NVIC_EnableIRQ(TIM1_UP_TIM10_IRQn);
     }
 }
 
@@ -150,10 +153,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *tim_baseHandle)
 
     if (tim_baseHandle->Instance == TIM3)
     {
-
         __HAL_RCC_TIM3_CLK_ENABLE();
-
-        
     }
 }
 
