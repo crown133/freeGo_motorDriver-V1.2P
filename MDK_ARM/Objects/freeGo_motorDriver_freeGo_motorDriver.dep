@@ -40,7 +40,7 @@ I (..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_tim.h)(0x5DA6BAC8)
 I (..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_tim_ex.h)(0x5DA6BAC8)
 I (..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_uart.h)(0x5DA6BAC8)
 I (..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_usart.h)(0x5DA6BAC8)
-F (..\main.c)(0x5E9673A1)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-3 -Oz -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../MDK_ARM -I ../Config -I ../delay -I ../DRV -I ../FastMath -I ../FOC -I ../PositionSensor -I ../Hardware/Inc -I ../Hardware/Drivers/STM32F4xx_HAL_Driver/Inc -I ../Hardware/Drivers/CMSIS/Core -I ../Hardware/Drivers/CMSIS/DSP/Include -I ../Hardware/Drivers/CMSIS/DSP/Lib/ARMCLANG -I ../../freeGo_motorDriver-V1.2P -I ../FlashWrite -I ../Calibration -I ../Hardware/Drivers/CMSIS/Include-I./RTE/_freeGo_motorDriver-ID:/MDK5/Keil/STM32F4xx_DFP/2.14.0/Drivers/CMSIS/Device/ST/STM32F4xx/Include-ID:/MDK5/ARM/CMSIS/Include-D__UVISION_VERSION="529" -DSTM32F405xx -DUSE_HAL_DRIVER -DSTM32F405xx -DARM_MATH_CM4 -D__FPU_USED="1"-o ./objects/main.o -MD)
+F (..\main.c)(0x5EA6C19D)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-3 -Oz -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../MDK_ARM -I ../Config -I ../delay -I ../DRV -I ../FastMath -I ../FOC -I ../PositionSensor -I ../Hardware/Inc -I ../Hardware/Drivers/STM32F4xx_HAL_Driver/Inc -I ../Hardware/Drivers/CMSIS/Core -I ../Hardware/Drivers/CMSIS/DSP/Include -I ../Hardware/Drivers/CMSIS/DSP/Lib/ARMCLANG -I ../../freeGo_motorDriver-V1.2P -I ../FlashWrite -I ../Calibration -I ../Hardware/Drivers/CMSIS/Include-I./RTE/_freeGo_motorDriver-ID:/MDK5/Keil/STM32F4xx_DFP/2.14.0/Drivers/CMSIS/Device/ST/STM32F4xx/Include-ID:/MDK5/ARM/CMSIS/Include-D__UVISION_VERSION="529" -DSTM32F405xx -DUSE_HAL_DRIVER -DSTM32F405xx -DARM_MATH_CM4 -D__FPU_USED="1"-o ./objects/main.o -MD)
 I (..\Hardware\Inc\sys.h)(0x5E06207B)
 I (..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h)(0x5DA6BAC8)
 I (..\Hardware\Inc\stm32f4xx_hal_conf.h)(0x5DE32B08)
@@ -84,12 +84,12 @@ I (..\Hardware\Inc\tim.h)(0x5DF45212)
 I (..\Hardware\Inc\led.h)(0x5DCEB24F)
 I (..\delay\delay.h)(0x5B8CAF0A)
 I (..\Hardware\Inc\adc.h)(0x5E86EACC)
-I (..\..\freeGo_motorDriver-V1.2P\structs.h)(0x5DF0FFE9)
+I (..\..\freeGo_motorDriver-V1.2P\structs.h)(0x5EA64C5B)
 I (..\PositionSensor\TLE5012B.h)(0x5E059341)
 I (..\PositionSensor\position.h)(0x5E8926F3)
 I (..\DRV\DRV8323.h)(0x5DF0AF03)
 I (..\FastMath\FastMath.h)(0x5DF0FFE9)
-I (..\FOC\foc.h)(0x5E967365)
+I (..\FOC\foc.h)(0x5EA6B5F7)
 I (..\Config\hw_config.h)(0x5E91E5FC)
 I (..\Config\current_controller_config.h)(0x5DF458B1)
 I (..\Hardware\Drivers\CMSIS\DSP\Include\arm_math.h)(0x5C8F4DD4)
@@ -99,7 +99,7 @@ I (..\FlashWrite\flash.h)(0x5E09C706)
 I (..\Config\motor_config.h)(0x5DEA0956)
 I (..\Config\user_config.h)(0x5E06274D)
 I (..\Calibration\calibration.h)(0x5E917E08)
-F (..\structs.h)(0x5DF0FFE9)()
+F (..\structs.h)(0x5EA64C5B)()
 F (.\startup_stm32f405xx.s)(0x5E893329)(--cpu Cortex-M4.fp.sp -g-I.\RTE\_freeGo_motorDriver-ID:\MDK5\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include-ID:\MDK5\ARM\CMSIS\Include--pd "__UVISION_VERSION SETA 529"--pd "STM32F405xx SETA 1"--list .\listings\startup_stm32f405xx.lst--xref -o .\objects\startup_stm32f405xx.o--depend .\objects\startup_stm32f405xx.d)
 F (..\Hardware\Drivers\CMSIS\Core\core_cm4.h)(0x5C8F4DD4)()
 F (..\Hardware\Drivers\CMSIS\Include\stm32f405xx.h)(0x5DA6BA88)()
@@ -259,7 +259,7 @@ I (..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_tim.h)(0x5DA6BAC8)
 I (..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_tim_ex.h)(0x5DA6BAC8)
 I (..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_uart.h)(0x5DA6BAC8)
 I (..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_usart.h)(0x5DA6BAC8)
-I (..\..\freeGo_motorDriver-V1.2P\structs.h)(0x5DF0FFE9)
+I (..\..\freeGo_motorDriver-V1.2P\structs.h)(0x5EA64C5B)
 F (..\Hardware\Src\led.c)(0x5DCE74CD)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-3 -Oz -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../MDK_ARM -I ../Config -I ../delay -I ../DRV -I ../FastMath -I ../FOC -I ../PositionSensor -I ../Hardware/Inc -I ../Hardware/Drivers/STM32F4xx_HAL_Driver/Inc -I ../Hardware/Drivers/CMSIS/Core -I ../Hardware/Drivers/CMSIS/DSP/Include -I ../Hardware/Drivers/CMSIS/DSP/Lib/ARMCLANG -I ../../freeGo_motorDriver-V1.2P -I ../FlashWrite -I ../Calibration -I ../Hardware/Drivers/CMSIS/Include-I./RTE/_freeGo_motorDriver-ID:/MDK5/Keil/STM32F4xx_DFP/2.14.0/Drivers/CMSIS/Device/ST/STM32F4xx/Include-ID:/MDK5/ARM/CMSIS/Include-D__UVISION_VERSION="529" -DSTM32F405xx -DUSE_HAL_DRIVER -DSTM32F405xx -DARM_MATH_CM4 -D__FPU_USED="1"-o ./objects/led.o -MD)
 I (..\Hardware\Inc\led.h)(0x5DCEB24F)
 I (..\Hardware\Inc\sys.h)(0x5E06207B)
@@ -1113,8 +1113,8 @@ I (..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_uart.h)(0x5DA6BAC8
 I (..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_usart.h)(0x5DA6BAC8)
 I (..\Hardware\Inc\spi.h)(0x5DB8251E)
 I (..\delay\delay.h)(0x5B8CAF0A)
-I (..\FOC\foc.h)(0x5E967365)
-I (..\..\freeGo_motorDriver-V1.2P\structs.h)(0x5DF0FFE9)
+I (..\FOC\foc.h)(0x5EA6B5F7)
+I (..\..\freeGo_motorDriver-V1.2P\structs.h)(0x5EA64C5B)
 I (..\FastMath\FastMath.h)(0x5DF0FFE9)
 I (..\Config\hw_config.h)(0x5E91E5FC)
 I (..\Config\current_controller_config.h)(0x5DF458B1)
@@ -1123,8 +1123,8 @@ I (D:\MDK5\ARM\ARMCLANG\include\string.h)(0x5DB34DA0)
 I (D:\MDK5\ARM\ARMCLANG\include\math.h)(0x5DB34DA0)
 I (..\Hardware\Inc\adc.h)(0x5E86EACC)
 I (..\Hardware\Inc\tim.h)(0x5DF45212)
-F (..\FOC\foc.c)(0x5E967584)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-3 -Oz -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../MDK_ARM -I ../Config -I ../delay -I ../DRV -I ../FastMath -I ../FOC -I ../PositionSensor -I ../Hardware/Inc -I ../Hardware/Drivers/STM32F4xx_HAL_Driver/Inc -I ../Hardware/Drivers/CMSIS/Core -I ../Hardware/Drivers/CMSIS/DSP/Include -I ../Hardware/Drivers/CMSIS/DSP/Lib/ARMCLANG -I ../../freeGo_motorDriver-V1.2P -I ../FlashWrite -I ../Calibration -I ../Hardware/Drivers/CMSIS/Include-I./RTE/_freeGo_motorDriver-ID:/MDK5/Keil/STM32F4xx_DFP/2.14.0/Drivers/CMSIS/Device/ST/STM32F4xx/Include-ID:/MDK5/ARM/CMSIS/Include-D__UVISION_VERSION="529" -DSTM32F405xx -DUSE_HAL_DRIVER -DSTM32F405xx -DARM_MATH_CM4 -D__FPU_USED="1"-o ./objects/foc.o -MD)
-I (..\FOC\foc.h)(0x5E967365)
+F (..\FOC\foc.c)(0x5EA6C16E)(-xc -std=c99 --target=arm-arm-none-eabi -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -c-fno-rtti -funsigned-char -fshort-enums -fshort-wchar-gdwarf-3 -Oz -ffunction-sections -Wno-packed -Wno-missing-variable-declarations -Wno-missing-prototypes -Wno-missing-noreturn -Wno-sign-conversion -Wno-nonportable-include-path -Wno-reserved-id-macro -Wno-unused-macros -Wno-documentation-unknown-command -Wno-documentation -Wno-license-management -Wno-parentheses-equality -I ../MDK_ARM -I ../Config -I ../delay -I ../DRV -I ../FastMath -I ../FOC -I ../PositionSensor -I ../Hardware/Inc -I ../Hardware/Drivers/STM32F4xx_HAL_Driver/Inc -I ../Hardware/Drivers/CMSIS/Core -I ../Hardware/Drivers/CMSIS/DSP/Include -I ../Hardware/Drivers/CMSIS/DSP/Lib/ARMCLANG -I ../../freeGo_motorDriver-V1.2P -I ../FlashWrite -I ../Calibration -I ../Hardware/Drivers/CMSIS/Include-I./RTE/_freeGo_motorDriver-ID:/MDK5/Keil/STM32F4xx_DFP/2.14.0/Drivers/CMSIS/Device/ST/STM32F4xx/Include-ID:/MDK5/ARM/CMSIS/Include-D__UVISION_VERSION="529" -DSTM32F405xx -DUSE_HAL_DRIVER -DSTM32F405xx -DARM_MATH_CM4 -D__FPU_USED="1"-o ./objects/foc.o -MD)
+I (..\FOC\foc.h)(0x5EA6B5F7)
 I (..\Hardware\Inc\sys.h)(0x5E06207B)
 I (..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h)(0x5DA6BAC8)
 I (..\Hardware\Inc\stm32f4xx_hal_conf.h)(0x5DE32B08)
@@ -1163,7 +1163,7 @@ I (..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_tim.h)(0x5DA6BAC8)
 I (..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_tim_ex.h)(0x5DA6BAC8)
 I (..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_uart.h)(0x5DA6BAC8)
 I (..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_usart.h)(0x5DA6BAC8)
-I (..\..\freeGo_motorDriver-V1.2P\structs.h)(0x5DF0FFE9)
+I (..\..\freeGo_motorDriver-V1.2P\structs.h)(0x5EA64C5B)
 I (..\FastMath\FastMath.h)(0x5DF0FFE9)
 I (..\Config\hw_config.h)(0x5E91E5FC)
 I (..\Config\current_controller_config.h)(0x5DF458B1)
@@ -1348,8 +1348,8 @@ I (..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_tim.h)(0x5DA6BAC8)
 I (..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_tim_ex.h)(0x5DA6BAC8)
 I (..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_uart.h)(0x5DA6BAC8)
 I (..\Hardware\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_usart.h)(0x5DA6BAC8)
-I (..\..\freeGo_motorDriver-V1.2P\structs.h)(0x5DF0FFE9)
-I (..\FOC\foc.h)(0x5E967365)
+I (..\..\freeGo_motorDriver-V1.2P\structs.h)(0x5EA64C5B)
+I (..\FOC\foc.h)(0x5EA6B5F7)
 I (..\FastMath\FastMath.h)(0x5DF0FFE9)
 I (..\Config\hw_config.h)(0x5E91E5FC)
 I (..\Config\current_controller_config.h)(0x5DF458B1)

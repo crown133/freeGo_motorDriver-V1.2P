@@ -29,10 +29,30 @@ typedef struct
 
 typedef struct
 {
-    double temperature;                                     // Estimated temperature
+	/******已系统输出y和输入u来跟踪估计系统状态和扰动*****/
+		float h;  //步长
+			
+		float omega; //系统带宽
+		float z1;
+		float z2;
+		float z3;//根据控制对象输入与输出，提取的扰动信息
+		float e;//系统状态误差
+		float beta_01;
+		float beta_02;
+		float beta_03;
+		float b0;//扰动补偿	
+		float u;//带扰动补偿后的输出
+} LESO;
+
+typedef struct
+{
+    double temperature;     // Estimated temperature
     double temperature2;
     float resistance;
-}   ObserverStruct;
+		float z1;
+		float z2;
+		float u;
+} ObserverStruct;
 
 #endif
 

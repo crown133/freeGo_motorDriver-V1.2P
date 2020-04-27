@@ -27,6 +27,8 @@
 #define SETUP_MODE 4
 #define ENCODER_MODE 5
 
+
+
 u8 state = 0;
 volatile u8 state_change;
 u8 statef = 0;
@@ -48,13 +50,13 @@ int main(void)
     delay_us(100);
 
     SysNVIC_SetPriority();
-	
-		flash_load();
+
+    flash_load();
     delay_us(100);
 
     TLE5012B_init(); //Positon Sensor Init
-		PS.ElecOffset = E_OFFSET;
-		PS.MechOffset = M_OFFSET;
+    PS.ElecOffset = E_OFFSET;
+    PS.MechOffset = M_OFFSET;
     delay_us(100);
 
     //  ADC_Init(); //ADC
@@ -64,26 +66,26 @@ int main(void)
     delay_us(100);
 
     reset_foc(&controller);    // Reset current controller
-    reset_observer(&observer); // Reset observer
+
     delay_us(100);
 
     drv8323_init(); //MOS Driver Init
     delay_us(100);
     zero_current(&controller.adc1_offset, &controller.adc2_offset); // Measure current sensor zero-offset
     delay_us(100);
-		init_controller_params(&controller);
-//    MX_TIM3_Init(); //40kHz timer global interrupt
-//    HAL_TIM_Base_Start_IT(&htim3);
-//    delay_ms(500);
+    init_controller_params(&controller);
+    //    MX_TIM3_Init(); //40kHz timer global interrupt
+    //    HAL_TIM_Base_Start_IT(&htim3);
+    //    delay_ms(500);
 
     MX_TIM1_Init(); //PWM output & timer global interrupt
-		HAL_TIM_Base_Start_IT(&htim1);  
+    HAL_TIM_Base_Start_IT(&htim1);
     delay_us(100);
-    
-		while (1)
+
+    while (1)
     {
         // delay_ms(10);
-			
+
     }
 }
 
@@ -107,39 +109,39 @@ void TIM1_UP_TIM10_IRQHandler(void)
 
     controller.v_bus = 0.95f * controller.v_bus + 0.05f * V_SCALE * (float)controller.adc3_raw;
 
-	if(statef)
-			{
-			  drv_enable_gd();
-				
-				float theta_ref = 0;
-				float theta_actual = 0;
-				float v_d = 0.1; //Put all volts on the D-Axis
-				float v_q = 0.0f;
-				float v_u, v_v, v_w = 0;
-				float dtc_u, dtc_v, dtc_w = .5f;
+    if (statef)
+    {
+        drv_enable_gd();
 
-				///Set voltage angle to zero, wait for rotor position to settle
-				abc(theta_ref, v_d, v_q, &v_u, &v_v, &v_w);      //inverse dq0 transform on voltages
-				svm(1.0, v_u, v_v, v_w, &dtc_u, &dtc_v, &dtc_w); //space vector modulation
-				
-				for (int i = 0; i < 20000; i++)
-				{
-					TIM1->CCR3 = (PWM_ARR >> 1) * (1.0f - dtc_u); // Set duty cycles
-					if (PHASE_ORDER)
-					{                                                        // Check which phase order to use,
-							TIM1->CCR2 = (PWM_ARR >> 1) * (1.0f - dtc_v); // Write duty cycles
-							TIM1->CCR1 = (PWM_ARR >> 1) * (1.0f - dtc_w);
-					}
-					else
-					{
-							TIM1->CCR1 = (PWM_ARR >> 1) * (1.0f - dtc_v);
-							TIM1->CCR2 = (PWM_ARR >> 1) * (1.0f - dtc_w);
-					}
-					delay_us(100);
-				}
-				drv_disable_gd();
-				statef = 0;
-			}
+        float theta_ref = 0;
+        float theta_actual = 0;
+        float v_d = 0.1; //Put all volts on the D-Axis
+        float v_q = 0.0f;
+        float v_u, v_v, v_w = 0;
+        float dtc_u, dtc_v, dtc_w = .5f;
+
+        ///Set voltage angle to zero, wait for rotor position to settle
+        abc(theta_ref, v_d, v_q, &v_u, &v_v, &v_w);      //inverse dq0 transform on voltages
+        svm(1.0, v_u, v_v, v_w, &dtc_u, &dtc_v, &dtc_w); //space vector modulation
+
+        for (int i = 0; i < 20000; i++)
+        {
+            TIM1->CCR3 = (PWM_ARR >> 1) * (1.0f - dtc_u); // Set duty cycles
+            if (PHASE_ORDER)
+            {                                                 // Check which phase order to use,
+                TIM1->CCR2 = (PWM_ARR >> 1) * (1.0f - dtc_v); // Write duty cycles
+                TIM1->CCR1 = (PWM_ARR >> 1) * (1.0f - dtc_w);
+            }
+            else
+            {
+                TIM1->CCR1 = (PWM_ARR >> 1) * (1.0f - dtc_v);
+                TIM1->CCR2 = (PWM_ARR >> 1) * (1.0f - dtc_w);
+            }
+            delay_us(100);
+        }
+        drv_disable_gd();
+        statef = 0;
+    }
     /// Check state machine state, and run the appropriate function ///
     switch (state)
     {
@@ -159,8 +161,8 @@ void TIM1_UP_TIM10_IRQHandler(void)
             order_phases(&PS, &controller); // Check phase ordering
             calibrate(&PS, &controller);    // Perform calibration procedure
             drv_disable_gd();
-            led_off; // Turn off status LED
-            flash_write();  //write to flash
+            led_off;       // Turn off status LED
+            flash_write(); //write to flash
             delay_ms(300);
             led_on;
             state_change = 0;
@@ -172,6 +174,7 @@ void TIM1_UP_TIM10_IRQHandler(void)
             drv_enable_gd();
             led_on;
             reset_foc(&controller);
+            reset_observer(&observer, &iq_eso, 5000, 0.025, 3);
             delay_ms(1);
             controller.i_d_ref = 0;
             controller.i_q_ref = 0;
@@ -191,9 +194,12 @@ void TIM1_UP_TIM10_IRQHandler(void)
             //                controller.kd = 0;
             //                controller.t_ff = 0;
             //            }
-            controller.kp_d = controller.kp_q;
-            controller.ki_d = controller.ki_q;
-            //    torque_control(&controller);
+						iq_eso.beta_01 = 2 * iq_eso.omega;
+						iq_eso.beta_02 = iq_eso.omega * iq_eso.omega;
+					
+//            controller.kp_d = controller.kp_q;
+//            controller.ki_d = controller.ki_q;
+            torque_control(&controller);
             commutate(&controller, &observer, controller.theta_elec);
 
             //            controller.timeout++;
@@ -213,6 +219,6 @@ void TIM1_UP_TIM10_IRQHandler(void)
         break;
     }
 
-//    HAL_TIM_IRQHandler(&htim3);
-		HAL_TIM_IRQHandler(&htim1);
+    //    HAL_TIM_IRQHandler(&htim3);
+    HAL_TIM_IRQHandler(&htim1);
 }

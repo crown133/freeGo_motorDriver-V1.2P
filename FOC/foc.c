@@ -2,9 +2,9 @@
 #include "motor_config.h"
 #include "user_config.h"
 
-
 ControllerStruct controller;
 ObserverStruct observer;
+LESO iq_eso;
 
 /// Inverse DQ0 Transform ///
 void abc(float theta, float d, float q, float *a, float *b, float *c)
@@ -122,7 +122,7 @@ void zero_current(int *offset_1, int *offset_2)
         TIM1->CCR3 = (PWM_ARR >> 1) * (1.0f); // Write duty cycles
         TIM1->CCR2 = (PWM_ARR >> 1) * (1.0f);
         TIM1->CCR1 = (PWM_ARR >> 1) * (1.0f);
-        ADC1->CR2 |= 0x40000000;  // Begin sample and conversion 三重同步模式下只开启adc1转换就能自动开启adc2 3
+        ADC1->CR2 |= 0x40000000; // Begin sample and conversion 三重同步模式下只开启adc1转换就能自动开启adc2 3
         delay_us(100);
         adc2_offset += ADC2->DR;
         adc1_offset += ADC3->DR;
@@ -157,6 +157,8 @@ void init_controller_params(ControllerStruct *controller)
     controller->ki_q = 0.0015f;
     controller->kp_d = 0.026f;
     controller->kp_q = 0.026f;
+		controller->kp = 3;
+		controller->kd = 1.15;
     //    controller->alpha = 1.0f - 1.0f / (1.0f - DT * I_BW * 2.0f * PI);
 }
 
@@ -176,16 +178,30 @@ void reset_foc(ControllerStruct *controller)
     controller->v_d = 0;
 }
 
-void reset_observer(ObserverStruct *observer)
+void reset_observer(ObserverStruct *observer, LESO* eso, float b0, float h, float omega)
 {
     observer->temperature = 25.0f;
     observer->resistance = .1f;
+
+		eso->h = h;
+		eso->b0 = b0;
+    eso->omega = omega;
+    eso->beta_01 = 2 * eso->omega;
+    eso->beta_02 = eso->omega * eso->omega;
 }
+
+static inline void LESO_2N(LESO* eso, float y)  
+{
+    eso->e = y - eso->z1;
+    eso->z1 += eso->h * (eso->z2 + eso->beta_01*eso->e + eso->b0*eso->u);
+		eso->z2 += eso->h * (eso->beta_02*eso->e);
+}
+
+uint8_t vq_adrc = 0;
+float kp_q = 0.005;
 
 void commutate(ControllerStruct *controller, ObserverStruct *observer, float theta)
 {
-    /// Observer Prediction ///
-
     /// Commutation Loop ///
     if (PHASE_ORDER)
     {                                                                                        // Check current sensor ordering
@@ -214,12 +230,15 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, float the
     // float scog1 = s;
     // float cogging_current = 0.25f * scog1 - 0.3f * scog12;
 
+    /// Observer Prediction ///
+    LESO_2N(&iq_eso, controller->i_q);
+		observer->z1 = iq_eso.z1;
+		observer->z2 = iq_eso.z2;
     /// Field Weakening ///
     // controller->fw_int += .001f * (0.5f * OVERMODULATION * controller->v_bus - controller->v_ref);
     // controller->fw_int = fmaxf(fminf(controller->fw_int, 0.0f), -I_FW_MAX);
     // controller->i_d_ref = controller->fw_int;
     //float i_cmd_mag_sq = controller->i_d_ref*controller->i_d_ref + controller->i_q_ref*controller->i_q_ref;
-
     limit_norm(&controller->i_d_ref, &controller->i_q_ref, I_MAX);
 
     /// PI Controller ///
@@ -231,22 +250,24 @@ void commutate(ControllerStruct *controller, ObserverStruct *observer, float the
 
     // Integrate Error //
     controller->d_int += controller->kp_d * controller->ki_d * i_d_error;
-    controller->q_int += controller->kp_q * controller->ki_q * i_q_error;
+    controller->q_int += controller->kp_q * controller->ki_q * i_q_error;  //
 
     controller->d_int = fmaxf(fminf(controller->d_int, OVERMODULATION * controller->v_bus), -OVERMODULATION * controller->v_bus);
     controller->q_int = fmaxf(fminf(controller->q_int, OVERMODULATION * controller->v_bus), -OVERMODULATION * controller->v_bus);
 
     controller->v_d = controller->kp_d * i_d_error + controller->d_int; //+ v_d_ff;
-    controller->v_q = controller->kp_q * i_q_error + controller->q_int; //+ v_q_ff;
+//    controller->v_q = controller->kp_q * i_q_error + controller->q_int; //+ v_q_ff;  //
 
+    iq_eso.u = kp_q * (controller->i_q_ref - iq_eso.z1) - iq_eso.z2 / iq_eso.b0;  //linear state error feedback
+		observer->u = iq_eso.u;
+//		if(vq_adrc)
+		{
+				controller->v_q = iq_eso.u;
+		}
     controller->v_ref = sqrt(controller->v_d * controller->v_d + controller->v_q * controller->v_q);
 
-    limit_norm(&controller->v_d, &controller->v_q, OVERMODULATION * controller->v_bus);                                  // Normalize voltage vector to lie within curcle of radius v_bus
-    abc(controller->theta_elec, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w); //inverse dq0 transform on voltages
-
-    //controller->v_u = c*controller->v_d - s*controller->v_q;                // Faster Inverse DQ0 transform
-    //controller->v_v = (0.86602540378f*s-.5f*c)*controller->v_d - (-0.86602540378f*c-.5f*s)*controller->v_q;
-    //controller->v_w = (-0.86602540378f*s-.5f*c)*controller->v_d - (0.86602540378f*c-.5f*s)*controller->v_q;
+    limit_norm(&controller->v_d, &controller->v_q, OVERMODULATION * controller->v_bus);                                                    // Normalize voltage vector to lie within curcle of radius v_bus
+    abc(controller->theta_elec, controller->v_d, controller->v_q, &controller->v_u, &controller->v_v, &controller->v_w);                   //inverse dq0 transform on voltages
     svm(controller->v_bus, controller->v_u, controller->v_v, controller->v_w, &controller->dtc_u, &controller->dtc_v, &controller->dtc_w); //space vector modulation
 
     // observer->i_d_dot = 0.5f * (controller->v_d - 2.0f * (observer->i_d_est * R_PHASE - controller->dtheta_elec * L_Q * observer->i_q_est)) / L_D; //feed-forward voltage
